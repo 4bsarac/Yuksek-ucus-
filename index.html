@@ -1984,10 +1984,10 @@
           <table>
             <thead>
               <tr>
-                <th>Öğrenci</th>
-                <th>Sınıf</th>
-                <th>Okul</th>
-                <th>Okul Sınıfı</th>
+                <th style="cursor: pointer; user-select: none;" id="sortGlobalName">Öğrenci <i data-lucide="arrow-up-down" style="width:12px; height:12px; vertical-align:middle; margin-left:4px;"></i></th>
+                <th style="cursor: pointer; user-select: none;" id="sortGlobalGroup">Sınıf <i data-lucide="arrow-up-down" style="width:12px; height:12px; vertical-align:middle; margin-left:4px;"></i></th>
+                <th style="cursor: pointer; user-select: none;" id="sortGlobalSchool">Okul <i data-lucide="arrow-up-down" style="width:12px; height:12px; vertical-align:middle; margin-left:4px;"></i></th>
+                <th style="cursor: pointer; user-select: none;" id="sortGlobalSchoolClass">Okul Sınıfı <i data-lucide="arrow-up-down" style="width:12px; height:12px; vertical-align:middle; margin-left:4px;"></i></th>
                 <th class="cell-right">İşlem</th>
               </tr>
             </thead>
@@ -2170,7 +2170,7 @@
         <select id="teacherLoginSelect"></select>
       </div>
       <div class="field" style="margin-top:10px;">
-        <label for="teacherPasswordInput">Şifre</label>
+        <label interpreter="tel" for="teacherPasswordInput">Şifre</label>
         <input type="password" id="teacherPasswordInput" placeholder="Öğretmen şifresi">
       </div>
       <button type="button" class="btn btn-emerald" id="teacherSessionBtn" style="width:100%;margin-top:10px;">
@@ -2274,7 +2274,8 @@ const state = {
   profileMode: "view",
   confirmCallback: null,
   selectedSettingsCustomClassId: "",
-  deferredPrompt: null // PWA yükleme olayı referansı
+  deferredPrompt: null, // PWA yükleme olayı referansı
+  studentSort: { column: "isim", direction: "asc" } // Aktif sıralama durumu
 };
 
 const el = {
@@ -2658,6 +2659,67 @@ function groupName(groupId) {
 
 function isAdmin() {
   return !TEACHER_APP && state.session.role !== "teacher";
+}
+
+// Sınıf alanlarından rakamsal sınıf değerlerini ayıklayan yardımcı fonksiyon (12-A -> 12)
+function parseGradeNumber(val) {
+  const str = String(val ?? "").trim();
+  const match = str.match(/^(\d+)/);
+  if (match) {
+    return parseInt(match[1], 10);
+  }
+  return null;
+}
+
+// Türkçe karakter hassasiyetli alfabetik sıralama fonksiyonu
+function compareTurkish(a, b, direction) {
+  const strA = String(a ?? "").trim();
+  const strB = String(b ?? "").trim();
+  return direction === "asc"
+    ? strA.localeCompare(strB, "tr")
+    : strB.localeCompare(strA, "tr");
+}
+
+// Okul sınıfı sütunu için sayı öncelikli dinamik sıralama
+function compareSchoolClass(a, b, direction) {
+  const numA = parseGradeNumber(a);
+  const numB = parseGradeNumber(b);
+
+  if (numA !== null && numB !== null) {
+    // İki değer de rakamsal ise: yön fark etmeksizin default azalan düzende (büyükten küçüğe)
+    return direction === "asc" ? numA - numB : numB - numA;
+  }
+  if (numA !== null && numB === null) {
+    // Sayısal olan her zaman üstte gelir
+    return -1;
+  }
+  if (numA === null && numB !== null) {
+    return 1;
+  }
+  // İki değer de metinsel ise: Türkçe alfabetik sıralama
+  return direction === "asc"
+    ? String(a).localeCompare(String(b), "tr")
+    : String(b).localeCompare(String(a), "tr");
+}
+
+// Sütun başlıklarındaki sıralama ikonlarını güncelleyen fonksiyon
+function updateSortIcons() {
+  const headers = [
+    { id: "sortGlobalName", label: "Öğrenci", col: "isim" },
+    { id: "sortGlobalGroup", label: "Sınıf", col: "grup" },
+    { id: "sortGlobalSchool", label: "Okul", col: "okul" },
+    { id: "sortGlobalSchoolClass", label: "Okul Sınıfı", col: "okulSinifi" }
+  ];
+  headers.forEach(h => {
+    const th = document.getElementById(h.id);
+    if (!th) return;
+    let icon = "arrow-up-down";
+    if (state.studentSort.column === h.col) {
+      icon = state.studentSort.direction === "asc" ? "arrow-up" : "arrow-down";
+    }
+    th.innerHTML = `${h.label} <i data-lucide="${icon}" style="width:12px; height:12px; vertical-align:middle; margin-left:4px;"></i>`;
+  });
+  refreshIcons();
 }
 
 // Bağlantı durumunu izleyen ve arayüze yansıtan fonksiyon
@@ -3476,12 +3538,34 @@ function renderStudents() {
       </tr>
     `;
   }).join("");
+  updateSortIcons();
 }
 
 function filteredGlobalStudents() {
-  return visibleStudents()
-    .filter(student => studentMatches(student, state.globalSearch, state.globalClassFilter))
-    .sort((a, b) => a.isim.localeCompare(b.isim, "tr"));
+  const students = visibleStudents()
+    .filter(student => studentMatches(student, state.globalSearch, state.globalClassFilter));
+
+  const { column, direction } = state.studentSort;
+
+  students.sort((a, b) => {
+    if (column === "isim") {
+      return compareTurkish(a.isim, b.isim, direction);
+    }
+    if (column === "grup") {
+      const nameA = groupName(a.grupId);
+      const nameB = groupName(b.grupId);
+      return compareTurkish(nameA, nameB, direction);
+    }
+    if (column === "okul") {
+      return compareTurkish(a.okul, b.okul, direction);
+    }
+    if (column === "okulSinifi") {
+      return compareSchoolClass(a.okulSinifi, b.okulSinifi, direction);
+    }
+    return 0;
+  });
+
+  return students;
 }
 
 function renderSettings() {
@@ -3663,7 +3747,7 @@ function renderProfile() {
     return;
   }
 
-  el.studentModalTitle.textContent = student.isim || "Öğrenci Profilili";
+  el.studentModalTitle.textContent = student.isim || "Öğrenci Profili";
   if (state.profileMode === "edit") {
     el.studentProfileBody.innerHTML = `
       <div class="field-row" style="grid-template-columns: 1fr; gap: 12px;">
@@ -4316,6 +4400,18 @@ function bindEvents() {
     }
   });
 
+  // Tıklama ile dinamik sıralama olayını tetikleme
+  const handleSortClick = (colName) => {
+    if (state.studentSort.column === colName) {
+      state.studentSort.direction = state.studentSort.direction === "asc" ? "desc" : "asc";
+    } else {
+      state.studentSort.column = colName;
+      // Okul sınıfı seçildiğinde varsayılan olarak büyük numaralardan (12, 11...) başlaması için
+      state.studentSort.direction = colName === "okulSinifi" ? "desc" : "asc";
+    }
+    renderStudents();
+  };
+
   document.addEventListener("click", event => {
     if (event.target.closest(".nav-btn") || event.target.closest(".class-btn")) {
       if (window.innerWidth <= 980) {
@@ -4501,6 +4597,24 @@ function bindEvents() {
           renderClass();
         });
       }
+      return;
+    }
+
+    // Sütun Sıralama Klik Tetikleyicileri
+    if (event.target.closest("#sortGlobalName")) {
+      handleSortClick("isim");
+      return;
+    }
+    if (event.target.closest("#sortGlobalGroup")) {
+      handleSortClick("grup");
+      return;
+    }
+    if (event.target.closest("#sortGlobalSchool")) {
+      handleSortClick("okul");
+      return;
+    }
+    if (event.target.closest("#sortGlobalSchoolClass")) {
+      handleSortClick("okulSinifi");
       return;
     }
 
