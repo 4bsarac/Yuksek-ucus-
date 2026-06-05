@@ -191,6 +191,7 @@
     overflow: hidden;
     background: var(--bg-input);
     flex: 0 0 auto;
+    cursor: pointer; /* Easter egg için tıklanabilir logo */
   }
 
   .brand-mark img {
@@ -2434,6 +2435,28 @@ function normalizeAttendance(attendance, count = HAFTA_SAYISI) {
   return next.slice(0, count).map(item => ["geldi", "gelmedi", "raporlu"].includes(item) ? item : BOS_YOKLAMA);
 }
 
+// PWA Ana Ekrana Ekleme Algılayıcısı
+window.addEventListener("beforeinstallprompt", event => {
+  event.preventDefault();
+  state.deferredPrompt = event;
+  if (el.pwaInstallBtn) {
+    el.pwaInstallBtn.style.display = "inline-flex";
+  }
+});
+
+if (el.pwaInstallBtn) {
+  el.pwaInstallBtn.addEventListener("click", async () => {
+    if (!state.deferredPrompt) return;
+    state.deferredPrompt.prompt();
+    const { outcome } = await state.deferredPrompt.userChoice;
+    if (outcome === "accepted") {
+      toast("Yüksek Uçuş ana ekranınıza ekleniyor!");
+    }
+    state.deferredPrompt = null;
+    el.pwaInstallBtn.style.display = "none";
+  });
+}
+
 function normalizeWeekTitles(titles, count = HAFTA_SAYISI) {
   const next = Array.isArray(titles) ? [...titles] : [];
   while (next.length < count) next.push("");
@@ -4592,7 +4615,7 @@ function bindEvents() {
       if (group && list) {
         confirmAction("Bu sütunu silmek istediğinizden emin misiniz? Sütundaki tüm kayıtlı veriler gizlenecektir.", async () => {
           list.columns = list.columns.filter(c => c.id !== colId);
-          await updateGroupCustomLists(group.id, group.customLists);
+          await updateGroupCustomLists(group.id, lists);
           renderCustomListActiveColumns(list);
           renderClass();
         });
