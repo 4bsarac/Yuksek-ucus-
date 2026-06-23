@@ -10,10 +10,16 @@
 
 <!-- iOS (iPhone) Ana Ekran Logosu Desteği -->
 <link rel="apple-touch-icon" href="https://kgztataiovugfhdwmfnc.supabase.co/storage/v1/object/public/Yuksek%20Ucus/Logo.png">
+<link rel="icon" type="image/png" sizes="512x512" href="https://kgztataiovugfhdwmfnc.supabase.co/storage/v1/object/public/Yuksek%20Ucus/Logo.png">
 
-<!-- Gömülü Manifest Dosyası (PWA - Ana Ekrana Ekleme Desteği İçin) -->
-<link rel="manifest" href='data:application/manifest+json,{"name":"Yüksek Uçuş","short_name":"Yüksek Uçuş","start_url":".","display":"standalone","background_color":"#0a0b0c","theme_color":"#0a0b0c","icons":[{"src":"https://kgztataiovugfhdwmfnc.supabase.co/storage/v1/object/public/Yuksek%20Ucus/Logo.png","sizes":"512x512","type":"image/png"}]}'>
+<!-- PWA - Ana Ekrana Ekleme Desteği -->
+<link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0a0b0c">
+<meta name="application-name" content="Yüksek Uçuş">
+<meta name="apple-mobile-web-app-title" content="Yüksek Uçuş">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
 
 <script src="https://unpkg.com/lucide@0.469.0"></script>
 <style>
@@ -1597,6 +1603,65 @@
     white-space: nowrap;
   }
 
+  .settings-row-stack {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .settings-row-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .settings-row-left {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .settings-class-popover-left {
+    left: 0;
+    right: auto;
+  }
+
+  .settings-save-btn {
+    flex: 0 0 auto;
+    min-width: 124px;
+  }
+
+  .settings-modal .tabs {
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+
+  .settings-modal .tab-btn {
+    flex: 0 0 auto;
+  }
+
+  .settings-modal .btn {
+    min-height: 34px;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 10px;
+  }
+
+  .settings-modal .icon-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .settings-modal .week-count-chip {
+    min-height: 34px;
+    padding: 6px 10px;
+  }
+
   .checkbox-row {
     cursor: pointer;
     color: var(--text);
@@ -2466,7 +2531,7 @@
 </div>
 
 <div class="modal-backdrop" id="settingsModal">
-  <div class="modal" style="width:min(100%,920px);">
+  <div class="modal settings-modal" style="width:min(100%,920px);">
     <div class="modal-head">
       <h2 class="modal-title">Sınıf Yönetimi</h2>
       <button type="button" class="icon-btn" data-close-modal="settingsModal" title="Kapat">
@@ -2878,9 +2943,22 @@ function normalizeAttendance(attendance, count = HAFTA_SAYISI) {
 }
 
 // PWA Ana Ekrana Ekleme Algılayıcısı
+function isPwaStandalone() {
+  return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+}
+
+if ("serviceWorker" in navigator && window.isSecureContext) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(error => {
+      console.warn("PWA servis çalışanı kaydedilemedi:", error);
+    });
+  });
+}
+
 function updatePwaInstallButtons(show) {
+  const shouldShow = show && !isPwaStandalone();
   [el.pwaInstallBtn, el.pwaDashInstallBtn].forEach(button => {
-    if (button) button.style.display = show ? "inline-flex" : "none";
+    if (button) button.style.display = shouldShow ? "inline-flex" : "none";
   });
 }
 
@@ -2891,7 +2969,10 @@ window.addEventListener("beforeinstallprompt", event => {
 });
 
 async function promptPwaInstall() {
-  if (!state.deferredPrompt) return;
+  if (!state.deferredPrompt) {
+    toast("Kurulum çıkmazsa tarayıcı menüsünden Ana ekrana ekle seçeneğini kullanın.", "info");
+    return;
+  }
   state.deferredPrompt.prompt();
   const { outcome } = await state.deferredPrompt.userChoice;
   if (outcome === "accepted") {
@@ -2900,6 +2981,12 @@ async function promptPwaInstall() {
   state.deferredPrompt = null;
   updatePwaInstallButtons(false);
 }
+
+window.addEventListener("appinstalled", () => {
+  state.deferredPrompt = null;
+  updatePwaInstallButtons(false);
+  toast("Yüksek Uçuş ana ekranınıza eklendi.");
+});
 
 if (el.pwaInstallBtn) {
   el.pwaInstallBtn.addEventListener("click", () => { void promptPwaInstall(); });
@@ -4053,16 +4140,16 @@ function renderSettings() {
   }
 
   el.settingsRenameTab.innerHTML = state.groups.length ? state.groups.map(group => `
-    <div class="settings-row" data-class-row="${escapeAttr(group.id)}" style="flex-direction: column; align-items: stretch; gap: 8px;">
-      <input type="text" value="${escapeAttr(group.name)}" data-class-name-input aria-label="${escapeAttr(group.name)} sınıf adı" style="width: 100%;">
-      <div style="display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
-        <div style="display: flex; gap: 6px; align-items: center;">
+    <div class="settings-row settings-row-stack" data-class-row="${escapeAttr(group.id)}">
+      <input type="text" value="${escapeAttr(group.name)}" data-class-name-input aria-label="${escapeAttr(group.name)} sınıf adı">
+      <div class="settings-row-actions">
+        <div class="settings-row-left">
           <details class="settings-class-details">
-            <summary class="btn btn-ghost" style="min-height:36px;">
+            <summary class="btn btn-ghost">
               <i data-lucide="calendar-days"></i>
               <span>Takvim & Gün</span>
             </summary>
-            <div class="settings-class-popover" style="left: 0; right: auto;">
+            <div class="settings-class-popover settings-class-popover-left">
               <div class="field-row" style="grid-template-columns: repeat(3, 1fr); gap: 8px;">
                 <div class="field">
                   <label>Ders Günü</label>
@@ -4079,18 +4166,18 @@ function renderSettings() {
                 </div>
                 <div class="field">
                   <label>Başlangıç</label>
-                  <input type="date" value="${escapeAttr(groupStartDate(group))}" data-class-start-date style="min-height:36px;">
+                  <input type="date" value="${escapeAttr(groupStartDate(group))}" data-class-start-date>
                 </div>
                 <div class="field">
                   <label>Bitiş</label>
-                  <input type="date" value="${escapeAttr(groupEndDate(group))}" data-class-end-date style="min-height:36px;">
+                  <input type="date" value="${escapeAttr(groupEndDate(group))}" data-class-end-date>
                 </div>
               </div>
             </div>
           </details>
-          <div class="week-count-chip" style="min-height:36px; padding:6px 10px;">${weekCountForGroup(group)} hafta</div>
+          <div class="week-count-chip">${weekCountForGroup(group)} hafta</div>
         </div>
-        <button type="button" class="btn btn-emerald" data-save-class-name="${escapeAttr(group.id)}" style="flex-grow: 1; min-height: 36px;">
+        <button type="button" class="btn btn-emerald settings-save-btn" data-save-class-name="${escapeAttr(group.id)}">
           <i data-lucide="save"></i>
           Kaydet
         </button>
