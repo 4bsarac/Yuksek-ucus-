@@ -15,9 +15,7 @@
 <link rel="manifest" href='data:application/manifest+json,{"name":"Yüksek Uçuş","short_name":"Yüksek Uçuş","start_url":".","display":"standalone","background_color":"#0a0b0c","theme_color":"#0a0b0c","icons":[{"src":"https://kgztataiovugfhdwmfnc.supabase.co/storage/v1/object/public/Yuksek%20Ucus/Logo.png","sizes":"512x512","type":"image/png"}]}'>
 <meta name="theme-color" content="#0a0b0c">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://unpkg.com/lucide@0.469.0"></script>
 <style>
   :root {
     --font-main: "Plus Jakarta Sans", Arial, sans-serif;
@@ -96,6 +94,10 @@
       linear-gradient(135deg, rgba(23, 195, 134, 0.045), transparent 34%),
       linear-gradient(315deg, rgba(84, 198, 232, 0.035), transparent 38%);
     opacity: 0.38;
+  }
+
+  body.modal-open {
+    overflow: hidden;
   }
 
   button,
@@ -191,7 +193,7 @@
     overflow: hidden;
     background: var(--bg-input);
     flex: 0 0 auto;
-    cursor: pointer; /* Easter egg için tıklanabilir logo */
+    cursor: default;
   }
 
   .brand-mark img {
@@ -240,7 +242,7 @@
     align-items: center;
     gap: 10px;
     border: 1px solid transparent;
-    border-radius: 8px;
+    border-radius: 10px;
     color: var(--text-soft);
     background: transparent;
     padding: 9px 11px;
@@ -248,21 +250,23 @@
     font-size: 13px;
     font-weight: 700;
     text-align: left;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
   }
 
   .nav-btn:hover,
   .class-btn:hover {
     color: var(--text);
-    background: rgba(255,255,255,0.04);
+    background: rgba(255,255,255,0.05);
     border-color: var(--line);
+    transform: translateX(2px);
   }
 
   .nav-btn.active,
   .class-btn.active {
     color: var(--text);
-    background: var(--bg-panel);
-    border-color: var(--line-strong);
+    background: linear-gradient(135deg, rgba(23, 195, 134, 0.12), rgba(255,255,255,0.03));
+    border-color: rgba(23, 195, 134, 0.28);
+    box-shadow: inset 0 0 0 1px rgba(23, 195, 134, 0.08);
   }
 
   .class-dot {
@@ -352,8 +356,8 @@
 
   .panel {
     border: 1px solid var(--line);
-    border-radius: 8px;
-    background: rgba(22, 24, 27, 0.88);
+    border-radius: 12px;
+    background: rgba(22, 24, 27, 0.92);
     box-shadow: var(--shadow);
   }
 
@@ -426,6 +430,317 @@
     align-items: end;
   }
 
+  .bulk-member-entry {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+
+  .bulk-member-grid {
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) minmax(160px, 0.35fr) auto;
+    gap: 10px;
+    align-items: end;
+  }
+
+  .bulk-member-grid textarea {
+    min-height: 112px;
+  }
+
+  .form-note {
+    margin: 6px 0 0;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+
+  .import-actions-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(220px, 0.72fr);
+    gap: 12px;
+  }
+
+  .import-action-card {
+    min-height: 132px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg-panel-2);
+    padding: 14px;
+  }
+
+  .import-action-card-strong {
+    border-color: rgba(23, 195, 134, 0.32);
+    background:
+      linear-gradient(135deg, rgba(23, 195, 134, 0.18), rgba(84, 198, 232, 0.08) 48%, var(--bg-panel-2) 72%);
+    box-shadow: inset 0 0 0 1px rgba(23, 195, 134, 0.08);
+  }
+
+  .import-template-card {
+    border-color: rgba(243, 90, 112, 0.35);
+    background:
+      linear-gradient(135deg, rgba(243, 90, 112, 0.16), rgba(242, 174, 61, 0.07) 54%, var(--bg-panel-2) 76%);
+    box-shadow: inset 0 0 0 1px rgba(243, 90, 112, 0.08);
+  }
+
+  .import-action-card h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 900;
+  }
+
+  .import-action-card p {
+    margin: 5px 0 0;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 750;
+    line-height: 1.45;
+  }
+
+  .import-file-button {
+    width: min(100%, 240px);
+  }
+
+  #studentImportFile {
+    display: none;
+  }
+
+  .import-preview-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 14px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--text-soft);
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .import-preview-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+    max-height: 380px;
+    overflow-y: auto;
+    padding-right: 2px;
+    padding-bottom: 6px;
+    scroll-behavior: smooth;
+  }
+
+  .import-preview-row {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) minmax(190px, 0.85fr) minmax(130px, 0.55fr) minmax(200px, 1.2fr);
+    gap: 10px;
+    align-items: center;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--bg-panel-2);
+    padding: 12px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, transform 0.15s ease;
+  }
+
+  .import-preview-row.is-active {
+    border-color: rgba(23, 195, 134, 0.55);
+    background:
+      linear-gradient(135deg, rgba(23, 195, 134, 0.1), rgba(84, 198, 232, 0.04) 42%, var(--bg-panel-2) 72%);
+    box-shadow: 0 0 0 1px rgba(23, 195, 134, 0.12), 0 10px 28px rgba(0, 0, 0, 0.22);
+    transform: translateY(-1px);
+  }
+
+  .import-preview-row.is-done {
+    border-color: rgba(84, 198, 232, 0.26);
+    background:
+      linear-gradient(135deg, rgba(84, 198, 232, 0.08), rgba(23, 195, 134, 0.04) 42%, var(--bg-panel-2) 76%);
+  }
+
+  .import-row-step {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .import-preview-row.is-active .import-row-step {
+    color: var(--emerald);
+  }
+
+  .import-preview-name {
+    margin-top: 2px;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 850;
+    line-height: 1.35;
+  }
+
+  .import-preview-meta {
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 750;
+  }
+
+  .import-preview-schoolline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 7px;
+  }
+
+  .import-preview-school,
+  .import-preview-school-class,
+  .import-preview-phone {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .import-preview-school {
+    color: #f5fbff;
+    background: rgba(84, 198, 232, 0.16);
+    border: 1px solid rgba(84, 198, 232, 0.24);
+  }
+
+  .import-preview-school-class {
+    color: #fff3d3;
+    background: rgba(242, 174, 61, 0.14);
+    border: 1px solid rgba(242, 174, 61, 0.24);
+  }
+
+  .import-preview-phone {
+    color: #d9ffe5;
+    background: rgba(23, 195, 134, 0.14);
+    border: 1px solid rgba(23, 195, 134, 0.22);
+  }
+
+  .import-change-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .import-change-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    border: 1px solid rgba(242, 174, 61, 0.35);
+    border-radius: 8px;
+    background: var(--amber-soft);
+    color: #ffd383;
+    padding: 5px 8px;
+    font-size: 11px;
+    font-weight: 850;
+    cursor: pointer;
+  }
+
+  .import-change-chip input {
+    width: 14px;
+    height: 14px;
+    accent-color: var(--amber);
+  }
+
+  .import-chip-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 190px;
+  }
+
+  .import-row-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .import-class-control {
+    display: grid;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .import-class-control.has-prev {
+    grid-template-columns: minmax(96px, 0.72fr) minmax(0, 1fr);
+  }
+
+  .import-class-select {
+    border-color: var(--line);
+    background: var(--bg-input);
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  .import-prev-class-btn {
+    min-width: 0;
+    width: 100%;
+    min-height: 38px;
+    border: 1px solid rgba(23, 195, 134, 0.38);
+    border-radius: 999px;
+    padding: 0 12px;
+    color: #d7ffec;
+    background: linear-gradient(135deg, rgba(23, 195, 134, 0.32), rgba(84, 198, 232, 0.12));
+    box-shadow: 0 4px 14px rgba(23, 195, 134, 0.14);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 900;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: transform 0.12s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .import-prev-class-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: rgba(23, 195, 134, 0.55);
+    box-shadow: 0 6px 18px rgba(23, 195, 134, 0.22);
+  }
+
+  .import-prev-class-btn:focus-visible {
+    outline: 2px solid rgba(23, 195, 134, 0.55);
+    outline-offset: 2px;
+  }
+
+  .import-preview-row.is-active .import-prev-class-btn {
+    animation: importPulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes importPulse {
+    0%, 100% { box-shadow: 0 4px 14px rgba(23, 195, 134, 0.14); }
+    50% { box-shadow: 0 6px 22px rgba(23, 195, 134, 0.32); }
+  }
+
+  .import-prev-class-btn:disabled {
+    color: var(--text-muted);
+    border-color: var(--line);
+    background: linear-gradient(90deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025));
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  .import-approve-row-btn {
+    min-height: 32px;
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
   .field {
     display: flex;
     flex-direction: column;
@@ -488,18 +803,30 @@
     justify-content: center;
     gap: 8px;
     border: 1px solid transparent;
-    border-radius: 8px;
-    padding: 9px 13px;
+    border-radius: 10px;
+    padding: 9px 14px;
     cursor: pointer;
     font-size: 13px;
     font-weight: 800;
     text-decoration: none;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
     white-space: nowrap;
   }
 
-  .btn:active {
-    transform: translateY(1px);
+  .btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .btn:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 
   .btn svg {
@@ -508,44 +835,54 @@
   }
 
   .btn-primary {
-    background: var(--text);
+    background: linear-gradient(180deg, #ffffff, #e8ebee);
     color: #0a0b0c;
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
   }
 
-  .btn-primary:hover {
-    background: #ffffff;
+  .btn-primary:hover:not(:disabled) {
+    background: linear-gradient(180deg, #ffffff, #f5f7f8);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
   }
 
   .btn-ghost {
     color: var(--text-soft);
-    background: transparent;
+    background: rgba(255, 255, 255, 0.02);
     border-color: var(--line);
   }
 
-  .btn-ghost:hover {
+  .btn-ghost:hover:not(:disabled) {
     color: var(--text);
-    background: rgba(255,255,255,0.04);
+    background: rgba(255,255,255,0.06);
     border-color: var(--line-strong);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
   }
 
   .btn-emerald {
-    color: var(--emerald);
-    background: var(--emerald-soft);
-    border-color: rgba(23, 195, 134, 0.28);
+    color: #d7ffec;
+    background: linear-gradient(135deg, rgba(23, 195, 134, 0.34), rgba(23, 195, 134, 0.16));
+    border-color: rgba(23, 195, 134, 0.42);
+    box-shadow: 0 8px 22px rgba(23, 195, 134, 0.14);
   }
 
-  .btn-emerald:hover {
-    background: rgba(23, 195, 134, 0.18);
+  .btn-emerald:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(23, 195, 134, 0.44), rgba(23, 195, 134, 0.22));
+    border-color: rgba(23, 195, 134, 0.55);
+    box-shadow: 0 10px 26px rgba(23, 195, 134, 0.22);
   }
 
   .btn-rose {
-    color: var(--rose);
-    background: var(--rose-soft);
-    border-color: rgba(243, 90, 112, 0.3);
+    color: #ffd0d8;
+    background: linear-gradient(135deg, rgba(243, 90, 112, 0.34), rgba(243, 90, 112, 0.16));
+    border-color: rgba(243, 90, 112, 0.42);
+    box-shadow: 0 8px 22px rgba(243, 90, 112, 0.12);
   }
 
-  .btn-rose:hover {
-    background: rgba(243, 90, 112, 0.18);
+  .btn-rose:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(243, 90, 112, 0.44), rgba(243, 90, 112, 0.22));
+    border-color: rgba(243, 90, 112, 0.55);
+    box-shadow: 0 10px 26px rgba(243, 90, 112, 0.2);
   }
 
   .icon-btn {
@@ -555,17 +892,19 @@
     align-items: center;
     justify-content: center;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: 10px;
     color: var(--text-soft);
-    background: transparent;
+    background: rgba(255, 255, 255, 0.02);
     cursor: pointer;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
   }
 
   .icon-btn:hover {
     color: var(--text);
-    background: rgba(255,255,255,0.04);
+    background: rgba(255,255,255,0.06);
     border-color: var(--line-strong);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
   }
 
   .icon-btn svg {
@@ -1100,6 +1439,7 @@
     padding: 18px;
     background: rgba(0,0,0,0.72);
     backdrop-filter: blur(6px);
+    overscroll-behavior: contain;
   }
 
   .modal-backdrop.open {
@@ -1115,6 +1455,7 @@
     background: var(--bg-panel);
     box-shadow: var(--shadow);
     animation: fadeUp 0.2s cubic-bezier(.16,1,.3,1) both;
+    overscroll-behavior: contain;
   }
 
   .modal-head {
@@ -1489,17 +1830,18 @@
       position: fixed;
       top: 0;
       bottom: 0;
-      left: -292px; /* Hidden left off-screen */
-      width: 292px;
+      left: 0;
+      width: min(292px, calc(100vw - 24px));
       height: 100vh;
       z-index: 105;
+      transform: translateX(-100%);
       transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
       background: var(--bg-side);
       box-shadow: 20px 0 40px rgba(0,0,0,0.5);
     }
 
     .sidebar.active {
-      transform: translateX(292px); /* Slide inside viewport */
+      transform: translateX(0);
     }
 
     .grid-stats {
@@ -1507,12 +1849,29 @@
     }
 
     .field-row,
+    .bulk-member-grid,
+    .import-actions-grid,
+    .import-preview-row,
     .profile-grid {
       grid-template-columns: 1fr;
     }
 
+    .import-preview-head {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
     .simple-student-row {
       grid-template-columns: 1fr;
+    }
+
+    .import-class-control.has-prev {
+      grid-template-columns: 1fr;
+    }
+
+    .import-preview-schoolline {
+      flex-direction: column;
+      align-items: flex-start;
     }
 
     .week-plan-layout,
@@ -1738,14 +2097,6 @@
           <span class="value" id="dashStudentCount">0</span>
           <span class="label">Öğrenci</span>
         </div>
-        <div class="stat" style="display:none;">
-          <span class="value" id="dashMarkedCount">0</span>
-          <span class="label">İşlenmiş Yoklama</span>
-        </div>
-        <div class="stat" style="display:none;">
-          <span class="value" id="dashAbsentCount">0</span>
-          <span class="label">Gelmedi Kaydı</span>
-        </div>
       </div>
 
       <div class="panel">
@@ -1773,25 +2124,6 @@
           <div class="tabs" id="classTabs" aria-label="Sınıf sekmeleri">
             <!-- Sekmeler JS ile dinamik olarak doldurulacaktır -->
           </div>
-        </div>
-      </div>
-
-      <div class="grid-stats" style="display:none;">
-        <div class="stat">
-          <span class="value" id="classStudentCount">0</span>
-          <span class="label">Öğrenci</span>
-        </div>
-        <div class="stat" style="display:none;">
-          <span class="value" id="classMarkedCount">0</span>
-          <span class="label">İşlenmiş Yoklama</span>
-        </div>
-        <div class="stat" style="display:none;">
-          <span class="value" id="classPresentCount">0</span>
-          <span class="label">Geldi Kaydı</span>
-        </div>
-        <div class="stat" style="display:none;">
-          <span class="value" id="classAbsentCount">0</span>
-          <span class="label">Gelmedi Kaydı</span>
         </div>
       </div>
 
@@ -1964,6 +2296,10 @@
           <h1 class="page-title">Tüm Öğrenciler</h1>
         </div>
         <div class="toolbar">
+          <button type="button" class="btn btn-emerald" id="openStudentImportBtn">
+            <i data-lucide="upload"></i>
+            Excel'den Üye Aktar
+          </button>
           <button type="button" class="btn btn-primary" id="exportStudentsBtn">
             <i data-lucide="file-spreadsheet"></i>
             Excel'e Aktar
@@ -2069,6 +2405,66 @@
   </div>
 </div>
 
+<div class="modal-backdrop" id="studentImportModal">
+  <div class="modal" style="width:min(100%,980px);">
+    <div class="modal-head">
+      <h2 class="modal-title">Excel'den Üye Aktar</h2>
+      <button type="button" class="icon-btn" data-close-modal="studentImportModal" title="Kapat">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="import-actions-grid">
+        <div class="import-action-card import-action-card-strong">
+          <div>
+            <h3>Excel Dosyası</h3>
+            <p id="studentImportFileName">Henüz dosya seçilmedi.</p>
+          </div>
+          <label class="btn btn-emerald import-file-button" for="studentImportFile">
+            <i data-lucide="file-up"></i>
+            Dosya Seç
+          </label>
+          <input type="file" id="studentImportFile" accept=".xlsx,.xls,.csv">
+        </div>
+        <div class="import-action-card import-template-card">
+          <div>
+            <h3>Örnek Şablon</h3>
+            <p>Ad Soyad, Okul, Okul Sınıfı ve Telefon sırasını sabit tutar.</p>
+          </div>
+          <button type="button" class="btn btn-rose" id="downloadStudentTemplateBtn">
+            <i data-lucide="download"></i>
+            Şablonu İndir
+          </button>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:12px;">
+        <label for="studentImportPaste">Excel'den Yapıştır</label>
+        <textarea id="studentImportPaste" placeholder="Ad Soyad&#9;Okul&#9;Okul Sınıfı&#9;Telefon"></textarea>
+      </div>
+      <div class="modal-actions" style="justify-content:flex-start;padding:10px 0 0;">
+        <button type="button" class="btn btn-ghost" id="readStudentImportPasteBtn">
+          <i data-lucide="clipboard-list"></i>
+          Yapıştırılanı Oku
+        </button>
+        <button type="button" class="btn btn-ghost" id="clearStudentImportBtn">
+          <i data-lucide="eraser"></i>
+          Temizle
+        </button>
+      </div>
+
+      <div class="import-preview-head">
+        <span id="studentImportSummary">Aktarım bekleniyor.</span>
+        <button type="button" class="btn btn-emerald" id="applyStudentImportBtn" disabled>
+          <i data-lucide="check"></i>
+          Aktarımı Uygula
+        </button>
+      </div>
+      <div class="import-preview-list" id="studentImportPreview"></div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-backdrop" id="settingsModal">
   <div class="modal" style="width:min(100%,920px);">
     <div class="modal-head">
@@ -2171,7 +2567,7 @@
         <select id="teacherLoginSelect"></select>
       </div>
       <div class="field" style="margin-top:10px;">
-        <label interpreter="tel" for="teacherPasswordInput">Şifre</label>
+        <label for="teacherPasswordInput">Şifre</label>
         <input type="password" id="teacherPasswordInput" placeholder="Öğretmen şifresi">
       </div>
       <button type="button" class="btn btn-emerald" id="teacherSessionBtn" style="width:100%;margin-top:10px;">
@@ -2205,8 +2601,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import {
   initializeFirestore,
-  persistentLocalCache,
-  persistentMultipleTabManager,
   collection,
   doc,
   addDoc,
@@ -2216,14 +2610,19 @@ import {
   onSnapshot,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import {
+  getAuth,
+  signInAnonymously
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const FB_CONFIG = {
-  apiKey: "AIzaSyD4N_YzSLm53Q4IgWE2-xZzQiTv0955XMY",
+  apiKey: "AIzaSyD4N_YzSLm53Q4IgWE2-xZzQiTvO955XMY",
   authDomain: "yuksekucus.firebaseapp.com",
   projectId: "yuksekucus",
   storageBucket: "yuksekucus.firebasestorage.app",
   messagingSenderId: "193228370547",
-  appId: "1:193228370547:web:615e67ddd2338b0773f006"
+  appId: "1:193228370547:web:615e67ddd2338b0773f006",
+  measurementId: "G-1FX3QFJ0S6"
 };
 
 const SUPABASE_CONFIG = {
@@ -2238,13 +2637,10 @@ const SESSION_KEY = "yu-session";
 const TEACHER_APP = new URLSearchParams(window.location.search).get("app") === "teacher";
 
 const app = initializeApp(FB_CONFIG);
+const auth = getAuth(app);
 
-// Firestore'u Çevrimdışı Önbellek (Offline Cache) desteği ile başlatma
-const db = initializeFirestore(app, {
-  localCache: persistentLocalCache({
-    tabManager: persistentMultipleTabManager()
-  })
-});
+// Kalıcı tarayıcı önbelleği kapalı: veri yalnızca Firestore izin verirse görünür.
+const db = initializeFirestore(app, {});
 
 document.body.classList.toggle("teacher-app", TEACHER_APP);
 
@@ -2276,7 +2672,16 @@ const state = {
   confirmCallback: null,
   selectedSettingsCustomClassId: "",
   deferredPrompt: null, // PWA yükleme olayı referansı
-  studentSort: { column: "isim", direction: "asc" } // Aktif sıralama durumu
+  studentSort: { column: "isim", direction: "asc" }, // Aktif sıralama durumu
+  studentImport: {
+    rows: [],
+    headers: [],
+    mappings: {},
+    preview: [],
+    rowClasses: {},
+    reviewedRows: new Set(),
+    focusIndex: -1
+  }
 };
 
 const el = {
@@ -2293,16 +2698,10 @@ const el = {
   switchSessionBtn: document.getElementById("switchSessionBtn"),
   dashClassCount: document.getElementById("dashClassCount"),
   dashStudentCount: document.getElementById("dashStudentCount"),
-  dashMarkedCount: document.getElementById("dashMarkedCount"),
-  dashAbsentCount: document.getElementById("dashAbsentCount"),
   homeClassGrid: document.getElementById("homeClassGrid"),
   homeEmpty: document.getElementById("homeEmpty"),
   classEyebrow: document.getElementById("classEyebrow"),
   classTitle: document.getElementById("classTitle"),
-  classStudentCount: document.getElementById("classStudentCount"),
-  classMarkedCount: document.getElementById("classMarkedCount"),
-  classPresentCount: document.getElementById("classPresentCount"),
-  classAbsentCount: document.getElementById("classAbsentCount"),
   classGeneralTab: document.getElementById("classGeneralTab"),
   classAttendanceTab: document.getElementById("classAttendanceTab"),
   studentEntryPanel: document.getElementById("studentEntryPanel"),
@@ -2327,7 +2726,18 @@ const el = {
   globalClassFilter: document.getElementById("globalClassFilter"),
   globalStudentTable: document.getElementById("globalStudentTable"),
   globalStudentEmpty: document.getElementById("globalStudentEmpty"),
+  openStudentImportBtn: document.getElementById("openStudentImportBtn"),
   exportStudentsBtn: document.getElementById("exportStudentsBtn"),
+  studentImportModal: document.getElementById("studentImportModal"),
+  studentImportFile: document.getElementById("studentImportFile"),
+  studentImportFileName: document.getElementById("studentImportFileName"),
+  downloadStudentTemplateBtn: document.getElementById("downloadStudentTemplateBtn"),
+  studentImportPaste: document.getElementById("studentImportPaste"),
+  readStudentImportPasteBtn: document.getElementById("readStudentImportPasteBtn"),
+  clearStudentImportBtn: document.getElementById("clearStudentImportBtn"),
+  studentImportSummary: document.getElementById("studentImportSummary"),
+  applyStudentImportBtn: document.getElementById("applyStudentImportBtn"),
+  studentImportPreview: document.getElementById("studentImportPreview"),
   newTeacherName: document.getElementById("newTeacherName"),
   newTeacherClassDetails: document.getElementById("newTeacherClassDetails"),
   newTeacherClassChoices: document.getElementById("newTeacherClassChoices"),
@@ -2399,6 +2809,25 @@ function refreshIcons() {
   }
 }
 
+async function ensureFirebaseAuth() {
+  if (auth.currentUser) return auth.currentUser;
+  try {
+    const credential = await signInAnonymously(auth);
+    await credential.user.getIdToken(true);
+    return credential.user;
+  } catch (error) {
+    const code = error?.code || error?.message || "bilinmeyen hata";
+    let hint = "Anonymous açıksa sayfayı http://localhost üzerinden açın ve Firebase kurallarını kontrol edin.";
+    if (code === "auth/unauthorized-domain") {
+      hint = "Firebase Console > Authentication > Settings > Authorized domains bölümüne localhost ekleyin.";
+    } else if (String(code).includes("api-key-not-valid")) {
+      hint = "Firebase Web API key yanlış, silinmiş veya kısıtlı. Project settings > General içindeki web config apiKey değerini dosyaya aynen kopyalayın.";
+    }
+    toast(`Firebase oturumu açılamadı (${code}). ${hint}`, "error");
+    throw error;
+  }
+}
+
 function toast(message, type = "success") {
   const icons = { success: "check-circle-2", error: "circle-alert", info: "info" };
   const item = document.createElement("div");
@@ -2413,13 +2842,26 @@ function toast(message, type = "success") {
   }, 3200);
 }
 
+function firestorePermissionMessage(label, error) {
+  const suffix = error?.code === "permission-denied"
+    ? " Veriler görünüyorsa tarayıcı önbelleğinden geliyor olabilir."
+    : "";
+  return `${label} yüklenemedi. Bağlantı veya yetki sorunu olabilir.${suffix}`;
+}
+
 function openModal(id) {
   document.getElementById(id)?.classList.add("open");
+  updateModalScrollLock();
   refreshIcons();
 }
 
 function closeModal(id) {
   document.getElementById(id)?.classList.remove("open");
+  updateModalScrollLock();
+}
+
+function updateModalScrollLock() {
+  document.body.classList.toggle("modal-open", Boolean(document.querySelector(".modal-backdrop.open")));
 }
 
 function confirmAction(message, callback, acceptText = "Sil") {
@@ -2436,25 +2878,35 @@ function normalizeAttendance(attendance, count = HAFTA_SAYISI) {
 }
 
 // PWA Ana Ekrana Ekleme Algılayıcısı
+function updatePwaInstallButtons(show) {
+  [el.pwaInstallBtn, el.pwaDashInstallBtn].forEach(button => {
+    if (button) button.style.display = show ? "inline-flex" : "none";
+  });
+}
+
 window.addEventListener("beforeinstallprompt", event => {
   event.preventDefault();
   state.deferredPrompt = event;
-  if (el.pwaInstallBtn) {
-    el.pwaInstallBtn.style.display = "inline-flex";
-  }
+  updatePwaInstallButtons(true);
 });
 
+async function promptPwaInstall() {
+  if (!state.deferredPrompt) return;
+  state.deferredPrompt.prompt();
+  const { outcome } = await state.deferredPrompt.userChoice;
+  if (outcome === "accepted") {
+    toast("Yüksek Uçuş ana ekranınıza ekleniyor!");
+  }
+  state.deferredPrompt = null;
+  updatePwaInstallButtons(false);
+}
+
 if (el.pwaInstallBtn) {
-  el.pwaInstallBtn.addEventListener("click", async () => {
-    if (!state.deferredPrompt) return;
-    state.deferredPrompt.prompt();
-    const { outcome } = await state.deferredPrompt.userChoice;
-    if (outcome === "accepted") {
-      toast("Yüksek Uçuş ana ekranınıza ekleniyor!");
-    }
-    state.deferredPrompt = null;
-    el.pwaInstallBtn.style.display = "none";
-  });
+  el.pwaInstallBtn.addEventListener("click", () => { void promptPwaInstall(); });
+}
+
+if (el.pwaDashInstallBtn) {
+  el.pwaDashInstallBtn.addEventListener("click", () => { void promptPwaInstall(); });
 }
 
 function normalizeWeekTitles(titles, count = HAFTA_SAYISI) {
@@ -2968,18 +3420,8 @@ function renderHome() {
   updateNetworkStatus();
   const groups = allowedGroups();
   const students = visibleStudents();
-  const totals = groups.reduce((acc, group) => {
-    const groupCounts = attendanceCounts(studentsForClass(group.id), group);
-    acc.marked += groupCounts.marked;
-    acc.present += groupCounts.present;
-    acc.absent += groupCounts.absent;
-    acc.reported += groupCounts.reported;
-    return acc;
-  }, { marked: 0, present: 0, absent: 0, reported: 0 });
   el.dashClassCount.textContent = groups.length;
   el.dashStudentCount.textContent = students.length;
-  el.dashMarkedCount.textContent = totals.marked;
-  el.dashAbsentCount.textContent = totals.absent;
 
   el.homeEmpty.style.display = groups.length ? "none" : "block";
   el.homeClassGrid.innerHTML = groups.map(group => {
@@ -3016,13 +3458,8 @@ function renderClass() {
   const students = studentsForClass(group.id);
   const weekCount = weekCountForGroup(group);
   state.selectedWeek = Math.max(0, Math.min(weekCount - 1, state.selectedWeek));
-  const counts = attendanceCounts(students, group);
   el.classEyebrow.textContent = "Sınıf";
   el.classTitle.textContent = group.name;
-  el.classStudentCount.textContent = students.length;
-  el.classMarkedCount.textContent = counts.marked;
-  el.classPresentCount.textContent = counts.present;
-  el.classAbsentCount.textContent = counts.absent;
 
   // Sınıf sekmelerini (Tabs) dinamik olarak oluşturma
   const customLists = group.customLists || [];
@@ -3844,6 +4281,35 @@ function render() {
   refreshIcons();
 }
 
+function cleanBulkCell(value) {
+  return String(value ?? "").replace(/\u00a0/g, " ").trim();
+}
+
+function normalizeMemberKey(value) {
+  return trLower(value).replace(/\s+/g, " ").trim();
+}
+
+function createBatchQueue() {
+  return { batch: writeBatch(db), count: 0 };
+}
+
+async function queueBatchWrite(queue, applyWrite) {
+  applyWrite(queue.batch);
+  queue.count += 1;
+  if (queue.count >= 450) {
+    await queue.batch.commit();
+    queue.batch = writeBatch(db);
+    queue.count = 0;
+  }
+}
+
+async function flushBatchQueue(queue) {
+  if (queue.count > 0) {
+    await queue.batch.commit();
+    queue.count = 0;
+  }
+}
+
 async function addMemberToSelectedClass() {
   if (!isAdmin()) return;
   const group = selectedClass();
@@ -3893,6 +4359,488 @@ async function addMemberToSelectedClass() {
     el.newMemberRole.value = "student";
   } catch (error) {
     toast(`Üye eklenemedi: ${error.message}`, "error");
+  }
+}
+
+const STUDENT_IMPORT_HEADERS = ["Ad Soyad", "Okul", "Okul Sınıfı", "Telefon"];
+const STUDENT_IMPORT_MAPPINGS = { isim: 0, okul: 1, okulSinifi: 2, telefon: 3 };
+
+const LAZY_SCRIPT_URLS = {
+  xlsx: "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
+  html2canvas: "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+};
+const lazyScriptPromises = {};
+
+function loadScriptOnce(key) {
+  if (lazyScriptPromises[key]) return lazyScriptPromises[key];
+  if (key === "xlsx" && window.XLSX) return Promise.resolve(window.XLSX);
+  if (key === "html2canvas" && window.html2canvas) return Promise.resolve(window.html2canvas);
+
+  lazyScriptPromises[key] = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = LAZY_SCRIPT_URLS[key];
+    script.async = true;
+    script.onload = () => {
+      if (key === "xlsx" && window.XLSX) resolve(window.XLSX);
+      else if (key === "html2canvas" && window.html2canvas) resolve(window.html2canvas);
+      else reject(new Error(`${key} hazır değil`));
+    };
+    script.onerror = () => reject(new Error(`${key} yüklenemedi`));
+    document.head.appendChild(script);
+  });
+  return lazyScriptPromises[key];
+}
+
+async function ensureXlsx() {
+  try {
+    await loadScriptOnce("xlsx");
+    return Boolean(window.XLSX);
+  } catch {
+    toast("Excel kütüphanesi yüklenemedi.", "error");
+    return false;
+  }
+}
+
+async function ensureHtml2Canvas() {
+  try {
+    await loadScriptOnce("html2canvas");
+    return Boolean(window.html2canvas);
+  } catch {
+    toast("Görsel kütüphanesi yüklenemedi.", "error");
+    return false;
+  }
+}
+
+function normalizeImportText(value) {
+  return trLower(value)
+    .replace(/ı/g, "i")
+    .replace(/ğ/g, "g")
+    .replace(/ü/g, "u")
+    .replace(/ş/g, "s")
+    .replace(/ö/g, "o")
+    .replace(/ç/g, "c")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function cleanStudentImportCell(value) {
+  if (value instanceof Date) return value.toLocaleDateString("tr-TR");
+  const text = cleanBulkCell(value).replace(/^"+|"+$/g, "");
+  if (/^\d{10}$/.test(text) && text.startsWith("5")) return `0${text}`;
+  return text;
+}
+
+function hasStudentImportHeader(row) {
+  const cells = row.slice(0, 4).map(normalizeImportText);
+  const aliases = [
+    ["ad soyad", "adsoyad", "isim", "ogrenci", "ogrenci adi"],
+    ["okul"],
+    ["okul sinifi", "sinif", "sube"],
+    ["telefon", "tel", "gsm", "irtibat"]
+  ];
+  const score = cells.reduce((total, cell, index) => {
+    if (!cell) return total;
+    return total + (aliases[index]?.some(alias => cell === alias || cell === normalizeImportText(alias)) ? 1 : 0);
+  }, 0);
+  return score >= 2 || aliases[0].some(alias => cells[0] === alias || cells[0] === normalizeImportText(alias));
+}
+
+function openStudentImportModal() {
+  if (!isAdmin()) return;
+  resetStudentImportState();
+  openModal("studentImportModal");
+}
+
+function resetStudentImportState() {
+  state.studentImport = {
+    rows: [],
+    headers: [],
+    mappings: {},
+    preview: [],
+    rowClasses: {},
+    reviewedRows: new Set(),
+    focusIndex: -1
+  };
+  el.studentImportFile.value = "";
+  el.studentImportFileName.textContent = "Henüz dosya seçilmedi.";
+  el.studentImportPaste.value = "";
+  el.studentImportPreview.innerHTML = "";
+  el.studentImportSummary.textContent = "Aktarım bekleniyor.";
+  el.applyStudentImportBtn.disabled = true;
+}
+
+function downloadStudentImportTemplate() {
+  void (async () => {
+    if (!(await ensureXlsx())) return;
+    const rows = [
+      { "Ad Soyad": "Ali Yılmaz", "Okul": "Mahmut Sami İmam Hatip Ortaokulu", "Okul Sınıfı": "7/A", "Telefon": "05551234567" },
+      { "Ad Soyad": "Ayşe Demir", "Okul": "Anadolu Lisesi", "Okul Sınıfı": "9/B", "Telefon": "" }
+    ];
+    const wb = window.XLSX.utils.book_new();
+    const ws = window.XLSX.utils.json_to_sheet(rows, { header: STUDENT_IMPORT_HEADERS });
+    ws["!cols"] = [{ wch: 28 }, { wch: 34 }, { wch: 14 }, { wch: 16 }];
+    window.XLSX.utils.book_append_sheet(wb, ws, "Ogrenci-Sablonu");
+    window.XLSX.writeFile(wb, "Yuksek-Ucus-Ogrenci-Aktarim-Sablonu.xlsx");
+    toast("Öğrenci aktarım şablonu indirildi.");
+  })();
+}
+
+function parseStudentImportText(text) {
+  return String(text || "")
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(Boolean)
+    .map(line => {
+      const separator = line.includes("\t") ? "\t" : (line.includes(";") ? ";" : ",");
+      return line.split(separator).map(cleanStudentImportCell);
+    });
+}
+
+async function readStudentImportFile(file) {
+  if (!file) return;
+  if (!(await ensureXlsx())) return;
+  try {
+    el.studentImportFileName.textContent = file.name;
+    const buffer = await file.arrayBuffer();
+    const workbook = window.XLSX.read(buffer, { type: "array", cellDates: true });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = window.XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" })
+      .map(row => row.map(cleanStudentImportCell));
+    setStudentImportRows(rows);
+    toast("Excel dosyası okundu.");
+  } catch (error) {
+    toast(`Excel okunamadı: ${error.message}`, "error");
+  }
+}
+
+function setStudentImportRows(rawRows) {
+  const rows = rawRows
+    .map(row => row.map(cleanStudentImportCell))
+    .filter(row => row.some(cell => cell));
+  if (!rows.length) {
+    toast("Aktarılacak satır bulunamadı.", "info");
+    return;
+  }
+
+  const first = rows[0];
+  const headerRow = hasStudentImportHeader(first);
+  const headers = STUDENT_IMPORT_HEADERS;
+  state.studentImport.rows = headerRow ? rows.slice(1) : rows;
+  state.studentImport.headers = headers;
+  state.studentImport.mappings = { ...STUDENT_IMPORT_MAPPINGS };
+  state.studentImport.rowClasses = {};
+  state.studentImport.reviewedRows = new Set();
+  state.studentImport.focusIndex = -1;
+  renderStudentImportPreview();
+  ensureStudentImportFocus();
+}
+
+function mappedImportCell(row, key) {
+  const index = STUDENT_IMPORT_MAPPINGS[key];
+  return index >= 0 ? cleanStudentImportCell(row[index]) : "";
+}
+
+function buildStudentImportPreview() {
+  const existingByName = new Map();
+  state.students.forEach(student => {
+    const key = normalizeMemberKey(student.isim);
+    if (key && !existingByName.has(key)) existingByName.set(key, student);
+  });
+  const seenInFile = new Set();
+
+  return state.studentImport.rows.map((row, rowIndex) => {
+    const item = {
+      rowIndex,
+      name: mappedImportCell(row, "isim"),
+      okul: mappedImportCell(row, "okul"),
+      okulSinifi: mappedImportCell(row, "okulSinifi"),
+      telefon: mappedImportCell(row, "telefon"),
+      classId: state.studentImport.rowClasses[rowIndex] || "",
+      changes: [],
+      action: "new"
+    };
+    const key = normalizeMemberKey(item.name);
+    if (!key) {
+      item.action = "error";
+      item.message = "Ad Soyad boş";
+      return item;
+    }
+    if (seenInFile.has(key)) {
+      item.action = "duplicate";
+      item.message = "Excel içinde tekrar";
+      return item;
+    }
+    seenInFile.add(key);
+
+    const existing = existingByName.get(key);
+    if (!existing) {
+      if (!item.classId) {
+        item.action = "needsClass";
+        item.message = "Sınıf seçin";
+      }
+      return item;
+    }
+
+    if (!item.classId) item.classId = existing.grupId || "";
+    item.action = "same";
+    item.existingId = existing.id;
+    [
+      { key: "grupId", label: "Sınıf", nextValue: item.classId, oldValue: existing.grupId },
+      { key: "okul", label: "Okul" },
+      { key: "okulSinifi", label: "Okul Sınıfı" },
+      { key: "telefon", label: "Telefon" }
+    ].forEach(field => {
+      const nextValue = cleanStudentImportCell(field.nextValue ?? item[field.key]);
+      const oldValue = cleanStudentImportCell(field.oldValue ?? existing[field.key]);
+      if (nextValue && normalizeMemberKey(nextValue) !== normalizeMemberKey(oldValue)) {
+        item.changes.push({
+          ...field,
+          oldValue,
+          newValue: nextValue,
+          oldDisplay: field.key === "grupId" ? groupName(oldValue) : oldValue,
+          newDisplay: field.key === "grupId" ? groupName(nextValue) : nextValue,
+          selected: true
+        });
+      }
+    });
+    if (item.changes.length) item.action = "update";
+    return item;
+  });
+}
+
+function importRowNeedsAttention(item) {
+  if (!item) return false;
+  if (item.action === "needsClass" && !item.classId) return true;
+  if (item.action === "update" && !state.studentImport.reviewedRows.has(item.rowIndex)) return true;
+  return false;
+}
+
+function findNextImportAttentionIndex(fromIndex = -1) {
+  const preview = state.studentImport.preview || [];
+  for (let index = fromIndex + 1; index < preview.length; index += 1) {
+    if (importRowNeedsAttention(preview[index])) return index;
+  }
+  return -1;
+}
+
+function ensureStudentImportFocus() {
+  if (state.studentImport.focusIndex < 0 || !importRowNeedsAttention(state.studentImport.preview[state.studentImport.focusIndex])) {
+    state.studentImport.focusIndex = findNextImportAttentionIndex(-1);
+  }
+}
+
+function markImportRowReviewed(index) {
+  const item = state.studentImport.preview[index];
+  if (!item) return;
+  state.studentImport.reviewedRows.add(item.rowIndex);
+  state.studentImport.focusIndex = findNextImportAttentionIndex(index);
+}
+
+function focusImportRow(index) {
+  if (index < 0) return;
+  requestAnimationFrame(() => {
+    const row = el.studentImportPreview.querySelector(`[data-import-row="${index}"]`);
+    if (!row) return;
+    row.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+    const prevButton = row.querySelector(".import-prev-class-btn:not(:disabled)");
+    if (prevButton) {
+      prevButton.focus({ preventScroll: true });
+      return;
+    }
+    const classSelect = row.querySelector(".import-class-select");
+    if (classSelect && !classSelect.value) {
+      classSelect.focus({ preventScroll: true });
+      return;
+    }
+    const approveButton = row.querySelector("[data-import-approve-row]");
+    if (approveButton) {
+      approveButton.focus({ preventScroll: true });
+      return;
+    }
+    const changeInput = row.querySelector("[data-import-change]");
+    if (changeInput) changeInput.focus({ preventScroll: true });
+  });
+}
+
+function renderStudentImportPreview() {
+  if (!state.studentImport.rows.length) {
+    el.studentImportPreview.innerHTML = "";
+    updateStudentImportSummary([]);
+    return;
+  }
+  state.studentImport.preview = buildStudentImportPreview();
+  ensureStudentImportFocus();
+  el.studentImportPreview.innerHTML = state.studentImport.preview.map((item, index) => renderStudentImportPreviewRow(item, index)).join("");
+  updateStudentImportSummary(state.studentImport.preview);
+  refreshIcons();
+  focusImportRow(state.studentImport.focusIndex);
+}
+
+function renderStudentImportPreviewRow(item, index) {
+  const isActive = index === state.studentImport.focusIndex;
+  const isDone = state.studentImport.reviewedRows.has(item.rowIndex)
+    || (item.action === "new" && Boolean(item.classId))
+    || item.action === "same";
+  const stepLabel = isActive ? "Sıradaki işlem" : `Satır ${index + 1}`;
+  const schoolBits = [
+    item.okul ? `<span class="import-preview-school">${escapeHtml(item.okul)}</span>` : "",
+    item.okulSinifi ? `<span class="import-preview-school-class">${escapeHtml(item.okulSinifi)}</span>` : "",
+    item.telefon ? `<span class="import-preview-phone">${escapeHtml(item.telefon)}</span>` : ""
+  ].filter(Boolean).join("");
+  const actionLabels = {
+    new: `<span class="badge badge-emerald">Yeni kayıt</span>`,
+    update: `<span class="badge badge-amber">Onay bekliyor</span>`,
+    same: `<span class="badge badge-cyan">Değişiklik yok</span>`,
+    needsClass: `<span class="badge badge-rose">Sınıf seçin</span>`,
+    duplicate: `<span class="badge badge-rose">${escapeHtml(item.message)}</span>`,
+    error: `<span class="badge badge-rose">${escapeHtml(item.message)}</span>`
+  };
+  const classControl = renderStudentImportClassControl(item, index);
+  const changes = item.changes.length ? `
+    <div class="import-change-list">
+      ${item.changes.map(change => `
+        <label class="import-change-chip" title="${escapeAttr(`${change.label}: ${change.oldDisplay || change.oldValue || "-"} -> ${change.newDisplay || change.newValue}`)}">
+          <input type="checkbox" data-import-change="${index}" data-import-field="${escapeAttr(change.key)}" ${change.selected ? "checked" : ""}>
+          <span class="import-chip-text">${escapeHtml(change.label)}: ${escapeHtml(change.oldDisplay || change.oldValue || "-")} -> ${escapeHtml(change.newDisplay || change.newValue)}</span>
+        </label>
+      `).join("")}
+      ${item.action === "update" && !state.studentImport.reviewedRows.has(item.rowIndex) ? `
+        <button type="button" class="btn btn-emerald import-approve-row-btn" data-import-approve-row="${index}">
+          Onayla ve Devam
+        </button>
+      ` : ""}
+    </div>
+  ` : `<div class="import-preview-meta">${item.action === "new" ? "Yeni öğrenci eklenecek." : (item.action === "needsClass" ? "Yeni kayıt için sınıf gerekir." : "Güncellenecek bilgi yok.")}</div>`;
+  return `
+    <div class="import-preview-row ${isActive ? "is-active" : ""} ${isDone ? "is-done" : ""}" data-import-row="${index}">
+      <div>
+        <div class="import-row-step">${stepLabel}</div>
+        <div class="import-preview-name">${escapeHtml(item.name || "-")}</div>
+        <div class="import-preview-schoolline">${schoolBits || `<span class="import-preview-meta">Okul bilgisi yok</span>`}</div>
+      </div>
+      <div>${classControl}</div>
+      <div>${actionLabels[item.action] || ""}</div>
+      <div>${changes}</div>
+    </div>
+  `;
+}
+
+function renderStudentImportClassControl(item, index) {
+  const groups = allowedGroups();
+  const prevItem = state.studentImport.preview[index - 1];
+  const prevClassId = prevItem?.classId || "";
+  const prevClassName = prevClassId ? groupName(prevClassId) : "";
+  const showPrevButton = Boolean(prevClassId && !item.classId);
+  const options = [
+    `<option value="">Sınıf seç</option>`,
+    ...groups.map(group => `<option value="${escapeAttr(group.id)}" ${item.classId === group.id ? "selected" : ""}>${escapeHtml(group.name)}</option>`)
+  ].join("");
+  return `
+    <div class="import-class-control ${showPrevButton ? "has-prev" : ""}">
+      ${showPrevButton ? `
+        <button type="button" class="import-prev-class-btn" data-import-use-prev-class="${index}" title="${escapeAttr(`${prevClassName} sınıfını bu satıra al`)}">
+          ${escapeHtml(prevClassName)}
+        </button>
+      ` : ""}
+      <select class="import-class-select" data-import-class="${index}" title="Bu öğrencinin sınıfı">
+        ${options}
+      </select>
+    </div>
+  `;
+}
+
+function updateStudentImportSummary(preview = state.studentImport.preview) {
+  const newCount = preview.filter(item => item.action === "new" && item.classId).length;
+  const updateCount = preview.filter(item => item.action === "update" && item.changes.some(change => change.selected)).length;
+  const needsClassCount = preview.filter(item => item.action === "needsClass").length;
+  const skipCount = preview.length - newCount - updateCount - needsClassCount;
+  const pendingCount = preview.filter((item, index) => importRowNeedsAttention(item)).length;
+  const progressText = pendingCount > 0 ? ` · ${pendingCount} satır sırada` : " · tüm satırlar tamam";
+  el.studentImportSummary.textContent = `${newCount} yeni, ${updateCount} güncelleme, ${needsClassCount} sınıf bekliyor, ${skipCount} atlanacak${progressText}.`;
+  el.applyStudentImportBtn.disabled = (newCount + updateCount) === 0;
+}
+
+function updateStudentImportChangeSelection(index, field, selected) {
+  const item = state.studentImport.preview[index];
+  const change = item?.changes.find(entry => entry.key === field);
+  if (!change) return;
+  change.selected = selected;
+  updateStudentImportSummary();
+}
+
+function setStudentImportClass(index, classId) {
+  const item = state.studentImport.preview[index];
+  if (!item) return;
+  state.studentImport.rowClasses[item.rowIndex] = classId;
+  if (classId && (item.action === "needsClass" || item.action === "new")) {
+    markImportRowReviewed(index);
+  }
+  renderStudentImportPreview();
+}
+
+function usePreviousStudentImportClass(index) {
+  const item = state.studentImport.preview[index];
+  const prevItem = state.studentImport.preview[index - 1];
+  if (!item || !prevItem?.classId) {
+    toast("Üst satırda seçili sınıf yok.", "info");
+    return;
+  }
+  state.studentImport.rowClasses[item.rowIndex] = prevItem.classId;
+  markImportRowReviewed(index);
+  renderStudentImportPreview();
+}
+
+function approveStudentImportRow(index) {
+  const item = state.studentImport.preview[index];
+  if (!item || item.action !== "update") return;
+  markImportRowReviewed(index);
+  renderStudentImportPreview();
+}
+
+async function applyStudentImport() {
+  if (!isAdmin()) return;
+  const queue = createBatchQueue();
+  let created = 0;
+  let updated = 0;
+  try {
+    el.applyStudentImportBtn.disabled = true;
+    for (const item of state.studentImport.preview) {
+      if (item.action === "new") {
+        const group = state.groups.find(groupItem => groupItem.id === item.classId);
+        if (!group) continue;
+        await queueBatchWrite(queue, batch => batch.set(doc(collection(db, "students")), {
+          isim: item.name,
+          grupId: group.id,
+          okul: item.okul || "",
+          okulSinifi: item.okulSinifi || "",
+          telefon: item.telefon || "",
+          yoklama: Array(weekCountForGroup(group)).fill(BOS_YOKLAMA),
+          customListValues: {},
+          kayitTarihi: new Date().toISOString(),
+          createdAt: serverTimestamp()
+        }));
+        created += 1;
+      } else if (item.action === "update") {
+        const patch = {};
+        item.changes.filter(change => change.selected).forEach(change => {
+          patch[change.key] = change.newValue;
+        });
+        if (Object.keys(patch).length) {
+          await queueBatchWrite(queue, batch => batch.update(doc(db, "students", item.existingId), {
+            ...patch,
+            updatedAt: serverTimestamp()
+          }));
+          updated += 1;
+        }
+      }
+    }
+    await flushBatchQueue(queue);
+    toast(`Aktarım tamamlandı: ${created} yeni, ${updated} güncelleme.`);
+    resetStudentImportState();
+    closeModal("studentImportModal");
+  } catch (error) {
+    toast(`Aktarım yapılamadı: ${error.message}`, "error");
+    el.applyStudentImportBtn.disabled = false;
   }
 }
 
@@ -3969,8 +4917,6 @@ async function saveWeeklyPlanFromUI() {
     toast(`Hafta kaydedilemedi: ${error.message}`, "error");
   }
 }
-
-selectedClass();
 
 function selectedWeeklyPlan() {
   const group = selectedClass();
@@ -4207,16 +5153,8 @@ function requestStudentDelete(studentId) {
   });
 }
 
-function ensureXlsx() {
-  if (!window.XLSX) {
-    toast("Excel kütüphanesi yüklenemedi.", "error");
-    return false;
-  }
-  return true;
-}
-
-function exportStudentsExcel() {
-  if (!ensureXlsx()) return;
+async function exportStudentsExcel() {
+  if (!(await ensureXlsx())) return;
   const students = filteredGlobalStudents();
   if (!students.length) {
     toast("Aktarılacak öğrenci bulunmuyor.", "info");
@@ -4246,8 +5184,8 @@ function exportStudentsExcel() {
 }
 
 // Özel Listeyi Excel Formatında İndirme (Boşluklara - İşareti Koyarak)
-function exportCustomListExcel(group, list) {
-  if (!ensureXlsx()) return;
+async function exportCustomListExcel(group, list) {
+  if (!(await ensureXlsx())) return;
   const students = studentsForClass(group.id).filter(student => studentMatches(student, state.classSearch));
   const columns = list.columns || [];
 
@@ -4278,9 +5216,10 @@ function exportCustomListExcel(group, list) {
 async function exportCustomListToImage(groupName, listName) {
   const element = document.getElementById("customListPrintArea");
   if (!element) return;
+  if (!(await ensureHtml2Canvas())) return;
   try {
     toast("Paylaşım görseli hazırlanıyor...", "info");
-    const canvas = await html2canvas(element, {
+    const canvas = await window.html2canvas(element, {
       backgroundColor: "#16181b",
       scale: 2, // Yüksek çözünürlük için
       logging: false,
@@ -4397,6 +5336,14 @@ function bindEvents() {
   mobileMenuBtn.addEventListener("click", () => toggleSidebar(true));
   sidebarBackdrop.addEventListener("click", () => toggleSidebar(false));
   closeSidebarBtn.addEventListener("click", () => toggleSidebar(false));
+  sidebar.addEventListener("click", event => {
+    if (window.innerWidth > 980) return;
+    const closeTrigger = event.target.closest(".nav-btn, .class-btn, #switchSessionBtn");
+    if (closeTrigger) toggleSidebar(false);
+  });
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 980) toggleSidebar(false);
+  });
 
   document.addEventListener("change", event => {
     if (event.target.closest("#newTeacherClassDetails")) {
@@ -4410,6 +5357,18 @@ function bindEvents() {
     const teacherRowDetails = event.target.closest(".teacher-class-details");
     if (teacherRowDetails) {
       updateDetailsSummary(teacherRowDetails, "Sınıflar", "Sınıf Seçildi");
+    }
+
+    const importClass = event.target.closest("[data-import-class]");
+    if (importClass) {
+      setStudentImportClass(Number(importClass.dataset.importClass), importClass.value);
+      return;
+    }
+
+    const importChange = event.target.closest("[data-import-change]");
+    if (importChange) {
+      updateStudentImportChangeSelection(Number(importChange.dataset.importChange), importChange.dataset.importField, importChange.checked);
+      return;
     }
 
     // Dinamik tablodaki hücrelerin değişikliğini izleyip anında Firebase'e kaydetme (Auto-Save)
@@ -4459,6 +5418,18 @@ function bindEvents() {
     if (deleteStudentButton) {
       if (!isAdmin()) return;
       requestStudentDelete(deleteStudentButton.dataset.deleteStudent);
+      return;
+    }
+
+    const importUsePrevClassButton = event.target.closest("[data-import-use-prev-class]");
+    if (importUsePrevClassButton) {
+      usePreviousStudentImportClass(Number(importUsePrevClassButton.dataset.importUsePrevClass));
+      return;
+    }
+
+    const importApproveRowButton = event.target.closest("[data-import-approve-row]");
+    if (importApproveRowButton) {
+      approveStudentImportRow(Number(importApproveRowButton.dataset.importApproveRow));
       return;
     }
 
@@ -4615,7 +5586,7 @@ function bindEvents() {
       if (group && list) {
         confirmAction("Bu sütunu silmek istediğinizden emin misiniz? Sütundaki tüm kayıtlı veriler gizlenecektir.", async () => {
           list.columns = list.columns.filter(c => c.id !== colId);
-          await updateGroupCustomLists(group.id, lists);
+          await updateGroupCustomLists(group.id, group.customLists);
           renderCustomListActiveColumns(list);
           renderClass();
         });
@@ -4698,6 +5669,17 @@ function bindEvents() {
     refreshIcons();
   });
 
+  el.openStudentImportBtn.addEventListener("click", openStudentImportModal);
+  el.downloadStudentTemplateBtn.addEventListener("click", downloadStudentImportTemplate);
+  el.studentImportFile.addEventListener("change", event => {
+    readStudentImportFile(event.target.files?.[0]);
+  });
+  el.readStudentImportPasteBtn.addEventListener("click", () => {
+    setStudentImportRows(parseStudentImportText(el.studentImportPaste.value));
+  });
+  el.clearStudentImportBtn.addEventListener("click", resetStudentImportState);
+  el.applyStudentImportBtn.addEventListener("click", applyStudentImport);
+
   el.weekTitleGrid.addEventListener("change", event => {
     const input = event.target.closest("[data-week-title]");
     if (input) updateWeekTitle(Number(input.dataset.weekTitle), input.value);
@@ -4756,7 +5738,7 @@ function bindEvents() {
     const group = selectedClass();
     if (!group) return;
     const list = (group.customLists || []).find(l => l.id === state.classTab);
-    if (list) exportCustomListExcel(group, list);
+    if (list) void exportCustomListExcel(group, list);
   });
 
   // Özel Liste Görsel İhracı (WhatsApp / Veliler İçin)
@@ -4764,7 +5746,7 @@ function bindEvents() {
     const group = selectedClass();
     if (!group) return;
     const list = (group.customLists || []).find(l => l.id === state.classTab);
-    if (list) exportCustomListToImage(group.name, list.name);
+    if (list) void exportCustomListToImage(group.name, list.name);
   });
 
   // Sekme İçi "Sütunları Düzenle" Paneli Aç/Kapat Butonları
@@ -4817,7 +5799,7 @@ function bindEvents() {
     render();
     toast(`${teacher.isim} oturumu açıldı.`);
   });
-  el.exportStudentsBtn.addEventListener("click", exportStudentsExcel);
+  el.exportStudentsBtn.addEventListener("click", () => { void exportStudentsExcel(); });
 
   el.confirmCancelBtn.addEventListener("click", () => {
     state.confirmCallback = null;
@@ -5073,12 +6055,12 @@ function startListeners() {
       state.view = "home";
     }
     render();
-  }, error => toast(`Sınıflar yüklenemedi: ${error.message}`, "error"));
+  }, error => toast(firestorePermissionMessage("Sınıflar", error), "error"));
 
   onSnapshot(collection(db, "students"), snapshot => {
     state.students = snapshot.docs.map(mapStudent).sort((a, b) => a.isim.localeCompare(b.isim, "tr"));
     render();
-  }, error => toast(`Öğrenciler yüklenemedi: ${error.message}`, "error"));
+  }, error => toast(firestorePermissionMessage("Öğrenciler", error), "error"));
 
   onSnapshot(collection(db, "teachers"), snapshot => {
     state.teachers = snapshot.docs.map(mapTeacher).sort((a, b) => a.isim.localeCompare(b.isim, "tr"));
@@ -5100,12 +6082,21 @@ function startListeners() {
       renderSessionModal();
       openModal("sessionModal");
     }
-  }, error => toast(`Öğretmenler yüklenemedi: ${error.message}`, "error"));
+  }, error => toast(firestorePermissionMessage("Öğretmenler", error), "error"));
 }
 
-bindEvents();
-render();
-startListeners();
+async function bootApp() {
+  bindEvents();
+  render();
+  try {
+    await ensureFirebaseAuth();
+    startListeners();
+  } catch (error) {
+    console.warn("Firebase Auth oturumu açılamadı, Firestore bağlantısı başlatılmadı:", error);
+  }
+}
+
+bootApp();
 </script>
 </body>
 </html>
