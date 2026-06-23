@@ -181,7 +181,7 @@
   .sidebar-inner {
     padding: 18px 16px;
   }
- 
+
   .brand {
     display: flex;
     align-items: center;
@@ -889,6 +889,100 @@
     background: linear-gradient(135deg, rgba(243, 90, 112, 0.44), rgba(243, 90, 112, 0.22));
     border-color: rgba(243, 90, 112, 0.55);
     box-shadow: 0 10px 26px rgba(243, 90, 112, 0.2);
+  }
+
+  .pwa-install-trigger {
+    width: 42px;
+    height: 40px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 0 11px;
+    overflow: hidden;
+    border: 1px solid rgba(84, 198, 232, 0.36);
+    border-radius: 14px;
+    color: #d8f7ff;
+    background:
+      linear-gradient(135deg, rgba(84, 198, 232, 0.22), rgba(23, 195, 134, 0.16)),
+      rgba(12, 14, 16, 0.92);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(4px);
+    transition: width 0.24s ease, opacity 0.18s ease, transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    white-space: nowrap;
+  }
+
+  .pwa-install-trigger.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .pwa-install-trigger[hidden] {
+    display: none !important;
+  }
+
+  .pwa-install-trigger:hover,
+  .pwa-install-trigger:focus-visible,
+  .pwa-install-trigger.is-expanded {
+    width: 176px;
+    border-color: rgba(84, 198, 232, 0.68);
+    background:
+      linear-gradient(135deg, rgba(84, 198, 232, 0.31), rgba(23, 195, 134, 0.22)),
+      rgba(12, 14, 16, 0.96);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  }
+
+  .pwa-install-trigger svg {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+  }
+
+  .pwa-install-label {
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0;
+    transition: max-width 0.24s ease, opacity 0.18s ease;
+  }
+
+  .pwa-install-trigger:hover .pwa-install-label,
+  .pwa-install-trigger:focus-visible .pwa-install-label,
+  .pwa-install-trigger.is-expanded .pwa-install-label {
+    max-width: 126px;
+    opacity: 1;
+  }
+
+  .pwa-install-trigger.is-ready::after {
+    content: "";
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--emerald);
+    box-shadow: 0 0 0 4px rgba(23, 195, 134, 0.12);
+  }
+
+  .pwa-install-sidebar {
+    position: relative;
+    margin-top: 8px;
+  }
+
+  .pwa-install-fab {
+    position: fixed;
+    right: 18px;
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    z-index: 120;
   }
 
   .icon-btn {
@@ -1986,6 +2080,11 @@
       font-size: 12px;
     }
 
+    .pwa-install-fab {
+      right: 14px;
+      bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    }
+
     .nav-btn, .class-btn {
       min-height: 34px;
       font-size: 12px;
@@ -2095,10 +2194,10 @@
             <span>Çevrimiçi</span>
           </div>
           
-          <!-- PWA Manuel Yükleme Butonu (İnternette ve HTTPS altındayken görünür) -->
-          <button type="button" class="btn btn-emerald" id="pwaInstallBtn" style="display:none; width:100%; margin-top:8px; min-height:30px; font-size:11px; padding:4px 8px;">
+          <!-- PWA Manuel Yükleme Butonu -->
+          <button type="button" class="pwa-install-trigger pwa-install-sidebar" id="pwaInstallBtn" aria-label="Uygulamayı yükle" aria-expanded="false">
             <i data-lucide="download-cloud"></i>
-            Ana Ekrana Ekle
+            <span class="pwa-install-label">Uygulamayı Yükle</span>
           </button>
         </div>
         <button type="button" class="icon-btn mobile-only-close" id="closeSidebarBtn" style="display:none;" aria-label="Kapat">
@@ -2144,10 +2243,10 @@
           <p class="eyebrow" id="dashDateEyebrow">Genel Bakış</p>
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
             <h1 class="page-title">Yüksek Uçuş Yönetim Paneli</h1>
-            <!-- PWA Dashboard İndirme Butonu -->
-            <button type="button" class="btn" id="pwaDashInstallBtn" style="display: none; min-height: 32px; padding: 4px 10px; font-size: 11px; background: var(--cyan-soft); color: var(--cyan); border: 1px solid rgba(84, 198, 232, 0.28); border-radius: 6px; gap: 6px;">
-              <i data-lucide="download"></i>
-              Uygulamayı Yükle
+            <!-- PWA Sabit Kurulum Butonu -->
+            <button type="button" class="pwa-install-trigger pwa-install-fab" id="pwaDashInstallBtn" aria-label="Uygulamayı yükle" aria-expanded="false">
+              <i data-lucide="download-cloud"></i>
+              <span class="pwa-install-label">Uygulamayı Yükle</span>
             </button>
           </div>
         </div>
@@ -2943,6 +3042,8 @@ function normalizeAttendance(attendance, count = HAFTA_SAYISI) {
 }
 
 // PWA Ana Ekrana Ekleme Algılayıcısı
+let pwaInstallCollapseTimer = null;
+
 function isPwaStandalone() {
   return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
 }
@@ -2955,22 +3056,59 @@ if ("serviceWorker" in navigator && window.isSecureContext) {
   });
 }
 
-function updatePwaInstallButtons(show) {
-  const shouldShow = show && !isPwaStandalone();
-  [el.pwaInstallBtn, el.pwaDashInstallBtn].forEach(button => {
-    if (button) button.style.display = shouldShow ? "inline-flex" : "none";
+function getPwaInstallButtons() {
+  return [el.pwaInstallBtn, el.pwaDashInstallBtn].filter(Boolean);
+}
+
+function setPwaInstallExpanded(expanded, autoClose = true) {
+  window.clearTimeout(pwaInstallCollapseTimer);
+  getPwaInstallButtons().forEach(button => {
+    button.classList.toggle("is-expanded", expanded);
+    button.setAttribute("aria-expanded", expanded ? "true" : "false");
   });
+
+  if (expanded && autoClose) {
+    pwaInstallCollapseTimer = window.setTimeout(() => {
+      setPwaInstallExpanded(false, false);
+    }, 5000);
+  }
+}
+
+function updatePwaInstallButtons() {
+  const shouldShow = !isPwaStandalone();
+  getPwaInstallButtons().forEach(button => {
+    button.hidden = !shouldShow;
+    button.classList.toggle("is-visible", shouldShow);
+    button.classList.toggle("is-ready", Boolean(state.deferredPrompt));
+    button.title = state.deferredPrompt
+      ? "Uygulamayı yükle"
+      : "Tarayıcı menüsünden Ana ekrana ekle";
+  });
+
+  if (!shouldShow) {
+    setPwaInstallExpanded(false, false);
+  }
 }
 
 window.addEventListener("beforeinstallprompt", event => {
   event.preventDefault();
   state.deferredPrompt = event;
-  updatePwaInstallButtons(true);
+  updatePwaInstallButtons();
+  setPwaInstallExpanded(true);
 });
 
 async function promptPwaInstall() {
+  setPwaInstallExpanded(true);
+  if (isPwaStandalone()) {
+    toast("Yüksek Uçuş zaten uygulama olarak açılmış.", "info");
+    return;
+  }
+  if (!window.isSecureContext) {
+    toast("Uygulama yükleme için sayfayı https:// veya http://localhost üzerinden açın.", "info");
+    return;
+  }
   if (!state.deferredPrompt) {
-    toast("Kurulum çıkmazsa tarayıcı menüsünden Ana ekrana ekle seçeneğini kullanın.", "info");
+    toast("Kurulum penceresi hazır değilse tarayıcı menüsünden Ana ekrana ekle seçeneğini kullanın.", "info");
     return;
   }
   state.deferredPrompt.prompt();
@@ -2979,22 +3117,22 @@ async function promptPwaInstall() {
     toast("Yüksek Uçuş ana ekranınıza ekleniyor!");
   }
   state.deferredPrompt = null;
-  updatePwaInstallButtons(false);
+  updatePwaInstallButtons();
 }
 
 window.addEventListener("appinstalled", () => {
   state.deferredPrompt = null;
-  updatePwaInstallButtons(false);
+  updatePwaInstallButtons();
   toast("Yüksek Uçuş ana ekranınıza eklendi.");
 });
 
-if (el.pwaInstallBtn) {
-  el.pwaInstallBtn.addEventListener("click", () => { void promptPwaInstall(); });
-}
+getPwaInstallButtons().forEach(button => {
+  button.addEventListener("click", () => { void promptPwaInstall(); });
+  button.addEventListener("mouseenter", () => setPwaInstallExpanded(true));
+  button.addEventListener("focus", () => setPwaInstallExpanded(true));
+});
 
-if (el.pwaDashInstallBtn) {
-  el.pwaDashInstallBtn.addEventListener("click", () => { void promptPwaInstall(); });
-}
+updatePwaInstallButtons();
 
 function normalizeWeekTitles(titles, count = HAFTA_SAYISI) {
   const next = Array.isArray(titles) ? [...titles] : [];
