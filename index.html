@@ -921,9 +921,9 @@
   }
 
   .pwa-install-trigger {
-    width: 42px;
-    height: 40px;
-    min-height: 40px;
+    width: 40px;
+    height: 38px;
+    min-height: 38px;
     display: inline-flex;
     align-items: center;
     justify-content: flex-start;
@@ -931,7 +931,7 @@
     padding: 0 11px;
     overflow: hidden;
     border: 1px solid rgba(84, 198, 232, 0.36);
-    border-radius: 14px;
+    border-radius: 10px;
     color: #d8f7ff;
     background:
       linear-gradient(135deg, rgba(84, 198, 232, 0.22), rgba(23, 195, 134, 0.16)),
@@ -958,7 +958,7 @@
   .pwa-install-trigger:hover,
   .pwa-install-trigger:focus-visible,
   .pwa-install-trigger.is-expanded {
-    width: 176px;
+    width: 170px;
     border-color: rgba(84, 198, 232, 0.68);
     background:
       linear-gradient(135deg, rgba(84, 198, 232, 0.31), rgba(23, 195, 134, 0.22)),
@@ -1007,11 +1007,10 @@
     margin-top: 8px;
   }
 
-  .pwa-install-fab {
-    position: fixed;
-    right: 18px;
-    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
-    z-index: 120;
+  .pwa-install-top {
+    position: relative;
+    margin-top: 8px;
+    margin-bottom: 4px;
   }
 
   .icon-btn {
@@ -2109,9 +2108,9 @@
       font-size: 12px;
     }
 
-    .pwa-install-fab {
-      right: 14px;
-      bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    .pwa-install-top {
+      margin-top: 7px;
+      margin-bottom: 2px;
     }
 
     .nav-btn, .class-btn {
@@ -2270,13 +2269,13 @@
       <div class="topbar">
         <div>
           <p class="eyebrow" id="dashDateEyebrow">Genel Bakış</p>
+          <!-- PWA Sabit Kurulum Butonu -->
+          <button type="button" class="pwa-install-trigger pwa-install-top" id="pwaDashInstallBtn" aria-label="Uygulamayı yükle" aria-expanded="false">
+            <i data-lucide="download-cloud"></i>
+            <span class="pwa-install-label">Uygulamayı Yükle</span>
+          </button>
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
             <h1 class="page-title">Yüksek Uçuş Yönetim Paneli</h1>
-            <!-- PWA Sabit Kurulum Butonu -->
-            <button type="button" class="pwa-install-trigger pwa-install-fab" id="pwaDashInstallBtn" aria-label="Uygulamayı yükle" aria-expanded="false">
-              <i data-lucide="download-cloud"></i>
-              <span class="pwa-install-label">Uygulamayı Yükle</span>
-            </button>
           </div>
         </div>
       </div>
@@ -3112,7 +3111,7 @@ function setPwaInstallExpanded(expanded, autoClose = true) {
   if (expanded && autoClose) {
     pwaInstallCollapseTimer = window.setTimeout(() => {
       setPwaInstallExpanded(false, false);
-    }, 5000);
+    }, 3000);
   }
 }
 
