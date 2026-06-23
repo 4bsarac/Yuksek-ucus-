@@ -4739,8 +4739,8 @@ function downloadStudentImportTemplate() {
   void (async () => {
     if (!(await ensureXlsx())) return;
     const rows = [
-      { "Ad Soyad": "Ali Yılmaz", "Okul": "Mahmut Sami İmam Hatip Ortaokulu", "Okul Sınıfı": "7/A", "Telefon": "05551234567" },
-      { "Ad Soyad": "Ayşe Demir", "Okul": "Anadolu Lisesi", "Okul Sınıfı": "9/B", "Telefon": "" }
+      { "Ad Soyad": "Berra Avcı", "Okul": "Mahmut Sami İmam Hatip", "Okul Sınıfı": "7/A", "Telefon": "05551234567" },
+      { "Ad Soyad": "Mehmet Fatih", "Okul": "Anadolu Lisesi", "Okul Sınıfı": "9/B", "Telefon": "" }
     ];
     const wb = window.XLSX.utils.book_new();
     const ws = window.XLSX.utils.json_to_sheet(rows, { header: STUDENT_IMPORT_HEADERS });
