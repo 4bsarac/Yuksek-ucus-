@@ -1,4 +1,4 @@
-const CACHE_NAME = "yuksek-ucus-pwa-v2";
+const CACHE_NAME = "yuksek-ucus-pwa-v3";
 const APP_SHELL = [
   "./yuksek-ucus-panel-duzeltilmis.html",
   "./manifest.webmanifest"
