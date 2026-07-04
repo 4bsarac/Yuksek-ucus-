@@ -4739,9 +4739,10 @@ function downloadStudentImportTemplate() {
   void (async () => {
     if (!(await ensureXlsx())) return;
     const rows = [
+      
+      { "Ad Soyad": "Mehmet Fatih", "Okul": "Abesel Pasa Hafiz IHO", "Okul Sınıfı": "6. Sınıf", "Telefon": "" },
       { "Ad Soyad": "Berra Avcı", "Okul": "Mahmut Sami Ramazanoğlu ", "Okul Sınıfı": "10. Sınıf", "Telefon": "05551234567" },
-      { "Ad Soyad": "Mehmet Fatih", "Okul": "Abesel Pasa Hafiz IHO", "Okul Sınıfı": "6. Sınıf", "Telefon": "" }
-    ];
+    ]
     const wb = window.XLSX.utils.book_new();
     const ws = window.XLSX.utils.json_to_sheet(rows, { header: STUDENT_IMPORT_HEADERS });
     ws["!cols"] = [{ wch: 28 }, { wch: 34 }, { wch: 14 }, { wch: 16 }];
